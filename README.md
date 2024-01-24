@@ -3,23 +3,10 @@
 This is [NodePing](https://nodeping.com) provider for Terraform. It can be used to manage 
 [NodePing resources](https://nodeping.com/docs-api-overview.html) like Checks or Contacts.
 
+Provider in the Terraform Registry: [terraform-provider-nodeping](https://registry.terraform.io/providers/EthDevOps/nodeping/latest)
+
 ## Quick start
 
-First of all, build and install the provider into your local Terraform installation:
-
-```bash
-git clone https://github.com/softkraftco/terraform-nodeping.git
-cd terraform-nodeping
-make install
-```
-
-Next create new Terraform project:
-
-```bash
-mkdir mynodeping
-cd mynodeping
-touch mynodeping.tf 
-```
 
 As a next step add NodePing provider to `required_providers` section of `mynodeping.tf ` file:
 
@@ -27,8 +14,8 @@ As a next step add NodePing provider to `required_providers` section of `mynodep
 terraform {
   required_providers {
     nodeping = {
-      version = "0.0.1"
-      source  = "softkraft.co/terraform/nodeping"
+      source = "EthDevOps/nodeping"
+      version = "0.0.7"
     }
   }  
 }
