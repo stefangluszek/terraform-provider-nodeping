@@ -1,6 +1,6 @@
 module terraform-nodeping
 
-go 1.18
+go 1.21
 
 require (
 	github.com/gruntwork-io/terratest v0.32.14
