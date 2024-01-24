@@ -8,7 +8,7 @@ terraform.tfstate.backup
 .terraform.lock.hcl
 
 dist/
-#vendor/
+vendor/
 
 #IntelliJ
 .idea
