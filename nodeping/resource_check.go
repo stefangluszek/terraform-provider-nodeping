@@ -21,7 +21,7 @@ func resourceCheck() *schema.Resource {
 		"SPEC10RDDS", "SSH", "SSL", "WEBSOCKET", "WHOIS",
 	}
 	httpAdvMethods := []string{"GET", "POST", "PUT", "HEAD", "TRACE", "CONNECT"}
-	trueFalseStrings := []string{"false", "true"}
+	//trueFalseStrings := []string{"false", "true"}
 
 	return &schema.Resource{
 		CreateContext: resourceCheckCreate,
@@ -65,6 +65,7 @@ func resourceCheck() *schema.Resource {
 					"ANY", "A", "AAAA", "CNAME", "MX", "NS", "PTR", "SOA", "SRV", "TXT",
 				}, false)},
 			"dnstoresolve": &schema.Schema{Type: schema.TypeString, Optional: true},
+			"dnssection":   &schema.Schema{Type: schema.TypeString, Optional: true},
 			"dnsrd":        &schema.Schema{Type: schema.TypeBool, Optional: true},
 			"transport": &schema.Schema{Type: schema.TypeString, Optional: true,
 				ValidateFunc: validation.StringInSlice([]string{"udp", "tcp"}, false)},
@@ -75,8 +76,7 @@ func resourceCheck() *schema.Resource {
 			"password": &schema.Schema{Type: schema.TypeString, Optional: true},
 			"secure": &schema.Schema{Type: schema.TypeString, Optional: true,
 				ValidateFunc: validation.StringInSlice([]string{"false", "ssl"}, false)},
-			"verify": &schema.Schema{Type: schema.TypeString, Optional: true,
-				ValidateFunc: validation.StringInSlice(trueFalseStrings, false)},
+			"verify": &schema.Schema{Type: schema.TypeBool, Optional: true},
 			"ignore": &schema.Schema{Type: schema.TypeString, Optional: true},
 			"invert": &schema.Schema{Type: schema.TypeBool, Optional: true, Default: false},
 			"warningdays": &schema.Schema{Type: schema.TypeInt, Optional: true,
@@ -262,11 +262,11 @@ func getCheckUpdateFromSchema(d *schema.ResourceData, ctx context.Context) *node
 	notificationsSchemaList := d.Get("notifications").(*schema.Set).List()
 	checkUpdate.Notifications = make([]map[string]nodeping_api_client.Notification, len(notificationsSchemaList))
 	for idx, nS := range notificationsSchemaList {
-		notisicationSchema := nS.(map[string]interface{})
+		notificationSchema := nS.(map[string]interface{})
 		notificationMap := make(map[string]nodeping_api_client.Notification, 1)
-		notificationMap[notisicationSchema["contact"].(string)] = nodeping_api_client.Notification{
-			notisicationSchema["delay"].(int),
-			notisicationSchema["schedule"].(string),
+		notificationMap[notificationSchema["contact"].(string)] = nodeping_api_client.Notification{
+			notificationSchema["delay"].(int),
+			notificationSchema["schedule"].(string),
 		}
 		checkUpdate.Notifications[idx] = notificationMap
 	}
@@ -278,6 +278,7 @@ func getCheckUpdateFromSchema(d *schema.ResourceData, ctx context.Context) *node
 	checkUpdate.Dohdot = d.Get("dohdot").(string)
 	checkUpdate.DnsType = d.Get("dnstype").(string)
 	checkUpdate.DnsToResolve = d.Get("dnstoresolve").(string)
+	checkUpdate.DnsSection = d.Get("dnssection").(string)
 	checkUpdate.Dnsrd = d.Get("dnsrd").(bool)
 	checkUpdate.Transport = d.Get("transport").(string)
 	checkUpdate.Follow = d.Get("follow").(bool)
@@ -286,7 +287,7 @@ func getCheckUpdateFromSchema(d *schema.ResourceData, ctx context.Context) *node
 	checkUpdate.Username = d.Get("username").(string)
 	checkUpdate.Password = d.Get("password").(string)
 	checkUpdate.Secure = d.Get("secure").(string)
-	checkUpdate.Verify = d.Get("verify").(string)
+	checkUpdate.Verify = d.Get("verify").(bool)
 	checkUpdate.Ignore = d.Get("ignore").(string)
 	checkUpdate.Invert = d.Get("invert").(bool)
 	checkUpdate.WarningDays = d.Get("warningdays").(int)

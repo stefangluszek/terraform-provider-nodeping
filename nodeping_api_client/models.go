@@ -67,11 +67,12 @@ type CheckUpdate struct { // used for PUT and POST requests.
 	Description   string                    `json:"description,omitempty"`
 	// the following are only relevant for certain types
 	CheckToken     string                 `json:"checktoken,omitempty"`
-	ClientCert     interface{}                 `json:"clientcert,omitempty"`
+	ClientCert     interface{}            `json:"clientcert,omitempty"`
 	ContentString  string                 `json:"contentstring,omitempty"`
 	Dohdot         string                 `json:"dohdot,omitempty"`
 	DnsType        string                 `json:"dnstype,omitempty"`
 	DnsToResolve   string                 `json:"dnstoresolve,omitempty"`
+	DnsSection     string                 `json:"dnssection,omitempty"`
 	Dnsrd          bool                   `json:"dnsrd,omitempty"`
 	Transport      string                 `json:"transport,omitempty"`
 	Follow         bool                   `json:"follow"`
@@ -80,7 +81,7 @@ type CheckUpdate struct { // used for PUT and POST requests.
 	Username       string                 `json:"username,omitempty"`
 	Password       string                 `json:"password,omitempty"`
 	Secure         string                 `json:"secure,omitempty"`
-	Verify         string                 `json:"verify,omitempty"`
+	Verify         bool                   `json:"verify,omitempty"`
 	Ignore         string                 `json:"ignore,omitempty"`
 	Invert         bool                   `json:"invert"`
 	WarningDays    int                    `json:"warningdays,omitempty"`
