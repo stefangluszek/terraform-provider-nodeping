@@ -67,7 +67,7 @@ type CheckUpdate struct { // used for PUT and POST requests.
 	Description   string                    `json:"description,omitempty"`
 	// the following are only relevant for certain types
 	CheckToken     string                 `json:"checktoken,omitempty"`
-	ClientCert     string                 `json:"clientcert,omitempty"`
+	ClientCert     interface{}                 `json:"clientcert,omitempty"`
 	ContentString  string                 `json:"contentstring,omitempty"`
 	Dohdot         string                 `json:"dohdot,omitempty"`
 	DnsType        string                 `json:"dnstype,omitempty"`

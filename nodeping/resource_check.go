@@ -2,10 +2,11 @@ package nodeping
 
 import (
 	"context"
-
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"reflect"
 
 	"terraform-nodeping/nodeping_api_client"
 )
@@ -165,9 +166,16 @@ func applyCheckToSchema(check *nodeping_api_client.Check, d *schema.ResourceData
 	}
 
 	for key, val := range check.Parameters {
-		err = d.Set(key, val)
-		if err != nil {
-			return err
+		if key == "clientcert" && reflect.TypeOf(val).Kind() == reflect.Bool {
+			err = d.Set(key, nil)
+			if err != nil {
+				return err
+			}
+		} else {
+			err = d.Set(key, val)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -211,7 +219,7 @@ func flattenFields(fields *map[string]nodeping_api_client.CheckField) []interfac
 	return flattened
 }
 
-func getCheckUpdateFromSchema(d *schema.ResourceData) *nodeping_api_client.CheckUpdate {
+func getCheckUpdateFromSchema(d *schema.ResourceData, ctx context.Context) *nodeping_api_client.CheckUpdate {
 	var checkUpdate nodeping_api_client.CheckUpdate
 
 	checkUpdate.ID = d.Id()
@@ -236,6 +244,18 @@ func getCheckUpdateFromSchema(d *schema.ResourceData) *nodeping_api_client.Check
 	} else {
 		checkUpdate.HomeLoc = d.Get("homeloc").(string)
 	}
+
+	tflog.Error(ctx, "HITTING")
+
+	var clientcertJson interface{} = d.Get("clientcert")
+	if reflect.TypeOf(clientcertJson).Kind() == reflect.Bool {
+		tflog.Error(ctx, "Cert is bool")
+		checkUpdate.ClientCert = nil
+	} else {
+		tflog.Error(ctx, "Cert is string")
+		checkUpdate.ClientCert = clientcertJson.(string)
+	}
+
 	checkUpdate.Threshold = d.Get("threshold").(int)
 	checkUpdate.Sens = d.Get("sens").(int)
 
@@ -254,7 +274,6 @@ func getCheckUpdateFromSchema(d *schema.ResourceData) *nodeping_api_client.Check
 	checkUpdate.Dep = d.Get("dep").(string)
 	checkUpdate.Description = d.Get("description").(string)
 	checkUpdate.CheckToken = d.Get("checktoken").(string)
-	checkUpdate.ClientCert = d.Get("clientcert").(string)
 	checkUpdate.ContentString = d.Get("contentstring").(string)
 	checkUpdate.Dohdot = d.Get("dohdot").(string)
 	checkUpdate.DnsType = d.Get("dnstype").(string)
@@ -286,13 +305,13 @@ func getCheckUpdateFromSchema(d *schema.ResourceData) *nodeping_api_client.Check
 		checkUpdate.Data = d.Get("data").(map[string]interface{})
 	}
 	if d.Get("receiveheaders") != nil {
-		checkUpdate.Data = d.Get("receiveheaders").(map[string]interface{})
+		checkUpdate.ReceiveHeaders = d.Get("receiveheaders").(map[string]interface{})
 	}
 	if d.Get("sendheaders") != nil {
-		checkUpdate.Data = d.Get("sendheaders").(map[string]interface{})
+		checkUpdate.SendHeaders = d.Get("sendheaders").(map[string]interface{})
 	}
-	if d.Get("ends") != nil {
-		checkUpdate.Data = d.Get("ends").(map[string]interface{})
+	if d.Get("edns") != nil {
+		checkUpdate.Edns = d.Get("edns").(map[string]interface{})
 	}
 	checkUpdate.Method = d.Get("method").(string)
 	checkUpdate.Statuscode = d.Get("statuscode").(int)
@@ -311,7 +330,7 @@ func getCheckUpdateFromSchema(d *schema.ResourceData) *nodeping_api_client.Check
 func resourceCheckCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*nodeping_api_client.Client)
 
-	checkUpdate := getCheckUpdateFromSchema(d)
+	checkUpdate := getCheckUpdateFromSchema(d, ctx)
 
 	savedCheck, err := client.CreateCheck(ctx, checkUpdate)
 	if err != nil {
@@ -345,7 +364,7 @@ func resourceCheckRead(ctx context.Context, d *schema.ResourceData, m interface{
 func resourceCheckUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*nodeping_api_client.Client)
 
-	checkUpdate := getCheckUpdateFromSchema(d)
+	checkUpdate := getCheckUpdateFromSchema(d, ctx)
 
 	_, err := client.UpdateCheck(ctx, checkUpdate)
 	if err != nil {
