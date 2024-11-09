@@ -2,11 +2,12 @@ package nodeping
 
 import (
 	"context"
+	"reflect"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"reflect"
 
 	"terraform-nodeping/nodeping_api_client"
 )
@@ -265,8 +266,8 @@ func getCheckUpdateFromSchema(d *schema.ResourceData, ctx context.Context) *node
 		notificationSchema := nS.(map[string]interface{})
 		notificationMap := make(map[string]nodeping_api_client.Notification, 1)
 		notificationMap[notificationSchema["contact"].(string)] = nodeping_api_client.Notification{
-			notificationSchema["delay"].(int),
-			notificationSchema["schedule"].(string),
+			Delay:    notificationSchema["delay"].(int),
+			Schedule: notificationSchema["schedule"].(string),
 		}
 		checkUpdate.Notifications[idx] = notificationMap
 	}

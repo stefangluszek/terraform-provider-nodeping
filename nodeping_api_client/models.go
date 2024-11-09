@@ -132,7 +132,7 @@ func (c *Contact) MarshalJSONForCreate() ([]byte, error) {
 }
 
 type Notification struct {
-	Delay    int    `json:"delay,omitempty"`
+	Delay    int    `json:"delay"`
 	Schedule string `json:"schedule,omitempty"`
 }
 
