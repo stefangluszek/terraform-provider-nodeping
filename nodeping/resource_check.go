@@ -114,6 +114,9 @@ func resourceCheck() *schema.Resource {
 				ValidateFunc: validation.IntBetween(-90, 0)},
 			"whoisserver": &schema.Schema{Type: schema.TypeString, Optional: true},
 		},
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 	}
 }
 
