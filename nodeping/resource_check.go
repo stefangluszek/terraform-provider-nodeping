@@ -41,7 +41,7 @@ func resourceCheck() *schema.Resource {
 			"runlocations": &schema.Schema{Type: schema.TypeSet, Optional: true, Elem: &schema.Schema{Type: schema.TypeString}},
 			"homeloc":      &schema.Schema{Type: schema.TypeString, Optional: true},
 			"threshold":    &schema.Schema{Type: schema.TypeInt, Optional: true, Default: 5},
-			"sens":         &schema.Schema{Type: schema.TypeInt, Optional: true},
+			"sens":         &schema.Schema{Type: schema.TypeInt, Optional: true, Default: 2},
 			"notifications": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
