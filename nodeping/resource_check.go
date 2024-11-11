@@ -140,7 +140,11 @@ func applyCheckToSchema(check *nodeping_api_client.Check, d *schema.ResourceData
 	if err != nil {
 		return err
 	}
-	err = d.Set("runlocations", check.Runlocations)
+	if check.Runlocations == false {
+		err = d.Set("runlocations", []string{})
+	} else {
+		err = d.Set("runlocations", check.Runlocations)
+	}
 	if err != nil {
 		return err
 	}
