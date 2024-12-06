@@ -35,7 +35,7 @@ type Check struct {
 	Public        bool                      `json:"public"`
 	Notifications []map[string]Notification `json:"notifications,omitempty"`
 	Parameters    map[string]interface{}    `json:"parameters,omitempty"`
-	Runlocations  []string                  `json:"runlocations,omitempty"`
+	Runlocations  interface{}               `json:"runlocations,omitempty"`
 	Created       int                       `json:"created,omitempty"`
 	Modified      int                       `json:"modified,omitempty"`
 	Queue         interface{}               `json:"queue,omitempty"`
@@ -132,7 +132,7 @@ func (c *Contact) MarshalJSONForCreate() ([]byte, error) {
 }
 
 type Notification struct {
-	Delay    int    `json:"delay,omitempty"`
+	Delay    int    `json:"delay"`
 	Schedule string `json:"schedule,omitempty"`
 }
 

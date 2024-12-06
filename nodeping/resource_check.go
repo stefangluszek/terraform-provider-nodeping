@@ -2,11 +2,12 @@ package nodeping
 
 import (
 	"context"
+	"reflect"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"reflect"
 
 	"terraform-nodeping/nodeping_api_client"
 )
@@ -40,7 +41,7 @@ func resourceCheck() *schema.Resource {
 			"runlocations": &schema.Schema{Type: schema.TypeSet, Optional: true, Elem: &schema.Schema{Type: schema.TypeString}},
 			"homeloc":      &schema.Schema{Type: schema.TypeString, Optional: true},
 			"threshold":    &schema.Schema{Type: schema.TypeInt, Optional: true, Default: 5},
-			"sens":         &schema.Schema{Type: schema.TypeInt, Optional: true},
+			"sens":         &schema.Schema{Type: schema.TypeInt, Optional: true, Default: 2},
 			"notifications": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
@@ -113,6 +114,9 @@ func resourceCheck() *schema.Resource {
 				ValidateFunc: validation.IntBetween(-90, 0)},
 			"whoisserver": &schema.Schema{Type: schema.TypeString, Optional: true},
 		},
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 	}
 }
 
@@ -139,7 +143,11 @@ func applyCheckToSchema(check *nodeping_api_client.Check, d *schema.ResourceData
 	if err != nil {
 		return err
 	}
-	err = d.Set("runlocations", check.Runlocations)
+	if check.Runlocations == false {
+		err = d.Set("runlocations", []string{})
+	} else {
+		err = d.Set("runlocations", check.Runlocations)
+	}
 	if err != nil {
 		return err
 	}
@@ -265,8 +273,8 @@ func getCheckUpdateFromSchema(d *schema.ResourceData, ctx context.Context) *node
 		notificationSchema := nS.(map[string]interface{})
 		notificationMap := make(map[string]nodeping_api_client.Notification, 1)
 		notificationMap[notificationSchema["contact"].(string)] = nodeping_api_client.Notification{
-			notificationSchema["delay"].(int),
-			notificationSchema["schedule"].(string),
+			Delay:    notificationSchema["delay"].(int),
+			Schedule: notificationSchema["schedule"].(string),
 		}
 		checkUpdate.Notifications[idx] = notificationMap
 	}
